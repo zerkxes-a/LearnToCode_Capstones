@@ -13,6 +13,6 @@ public class Payment {
         @Override
         //GETS ALL THE VALUES AND MAKES IT INTO A STRING
         public String toString() {
-            return String.format("%s | %s | %.2f\n", description, vendor, price);
+            return String.format("%s | %s | -%.2f\n", description, vendor, price);
     }
 }
