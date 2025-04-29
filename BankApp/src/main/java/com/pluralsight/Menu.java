@@ -40,8 +40,8 @@ public class Menu {
                     break;
                 case "P": //GO TO THE SECOND PAGE (MAKE A PAYMENT)
                     System.out.println("Continue to Payment (Please press Enter):  ");
-                    scanner.next();
-                    //todo prompt user for debit info and save to csv file
+                    scanner.nextLine();
+                    paymentInfo();
                     break;
                 case "L": //CREATE LEDGER MENU TO CALL TO
                     System.out.println("Continue to Ledger Menu (Please press Enter): ");
@@ -57,6 +57,7 @@ public class Menu {
     //DEPOSIT SCREEN
     private static void depositInfo() {
 
+        System.out.println("Please enter some info to record a Deposit: \n");
         System.out.print("Please enter the Transaction Description: ");
         String description = scanner.nextLine();
         System.out.print("Please enter the Vendor Name: ");
@@ -75,12 +76,27 @@ public class Menu {
         }
     }
     //PAYMENT SCREEN
-    //todo ALL OF IT DO IT ALL PLACEHOLDER FOR LATER!!!
+    //todo GET PAYMENT INFO TO WRITE INTO TRANSACTIONS.CSV WITH PRICE BEING NEGATIVE DO BETTER ANNA LETS MAKE THIS NICE
     private static void paymentInfo(){
 
+        System.out.println("Please fill out some info to record a payment: \n");
+        System.out.print("Please enter the Transaction Description: ");
+        String description = scanner.nextLine();
+        System.out.print("Please enter the Vendor Name: ");
+        String vendor = scanner.nextLine();
+        System.out.print("Please enter the Payment Amount: ");
+        float price = scanner.nextFloat();
+        scanner.nextLine();
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("src/main/resources/transactions.csv", true))) {
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm:ss | ");
+            //WRITES PAYMENT INFO TO TRANSACTIONS.CSV
+            bufferedWriter.write((now.format(formatter)) + new Deposit(description, vendor, price));
+        } catch (IOException e) {
+            e.printStackTrace();
     }
-    //LEDGER SCREEN
-    private static void ledgerMenu(){
+    //LEDGER SCREEN todo will need to call reader method to read from transactions.csv
+    //private static void ledgerMenu(){
         System.out.println("Welcome to the Leger Menu\n");
         System.out.println("Please choose from the following options: \n");
         System.out.println("A) All - display all transactions");
@@ -91,8 +107,8 @@ public class Menu {
 
     }
     // CONVIENCE METHODS GO HERE
-    //convience method for choosing lettered screen choices
-    private static String scanChar () { //todo FUCKING DO BETTER MAKE STRING tHAT ONLY READS FIRST LETTER
+    //convience method for choosing lettered screen choices todo dont think im acutally using this. check for code redundencany
+    private static String scanChar () {
         while (!scanner.hasNext()) {
             scanner.nextLine();
             System.out.println("Please ONLY enter a single Letter");
@@ -111,6 +127,6 @@ public class Menu {
         }
         int choice = scanner.nextInt();
         scanner.nextLine();
-        return choice;
+       return choice;
     }
 }
