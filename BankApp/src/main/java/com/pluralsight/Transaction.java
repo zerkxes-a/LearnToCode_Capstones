@@ -1,18 +1,19 @@
 package com.pluralsight;
 
-public class Payment {
+
+public class Transaction {
     private String description;
     private String vendor;
     private float price;
     //CONSTRUCTOR METHOD(USED TO CREATE INSTANCE OF OBJECT FROM INPUT IN MENU) AUTOMATICALLY SETS VALUES
-    public Payment(String description, String vendor, float price){
+    public Transaction(String description, String vendor, String s, String string, float price){
         this.description = description;
         this.vendor = vendor;
         this.price = price;
-        }
-        @Override
-        //GETS ALL THE VALUES AND MAKES IT INTO A STRING
-        public String toString() {
-            return String.format("%s | %s | -%.2f\n", description, vendor, price);
+    }
+    @Override
+    //GETS ALL THE VALUES AND MAKES IT INTO A STRING
+    public String toString() {
+        return String.format("%s | %s | %.2f\n", description, vendor, price);
     }
 }

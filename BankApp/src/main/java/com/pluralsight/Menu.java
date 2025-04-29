@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
+import static com.pluralsight.ListParse.loadProducts;
+
 
 public class Menu {
     static Scanner scanner = new Scanner(System.in);
@@ -62,11 +64,11 @@ public class Menu {
     private static void depositInfo() {
 
         System.out.println("Please enter some info to record a Deposit: \n");
-        System.out.print("Please enter the Transaction Description: ");
+        System.out.print("Please enter the type of Deposit: ");
         String description = scanner.nextLine();
         System.out.print("Please enter the Vendor Name: ");
         String vendor = scanner.nextLine();
-        System.out.print("Please enter the Deposit Amount: ");
+        System.out.print("Please enter the Deposit Amount (only positive): ");
         float price = scanner.nextFloat();
         scanner.nextLine(); //CONSUME LINE CLRF
         //research what this is Anna!!!!
@@ -74,11 +76,12 @@ public class Menu {
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm:ss | ");
             //WRITES DEPOSIT INFO TO TRANSACTIONS.CSV
-           bufferedWriter.write((now.format(formatter)) + new Deposit(description, vendor, price));
+           bufferedWriter.write((now.format(formatter)) + new Transaction(description, vendor, description, vendor, price));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     //PAYMENT SCREEN
     private static void paymentInfo(){
 
@@ -87,14 +90,14 @@ public class Menu {
         String description = scanner.nextLine();
         System.out.print("Please enter the Vendor Name: ");
         String vendor = scanner.nextLine();
-        System.out.print("Please enter the Payment Amount: ");
+        System.out.print("Please enter the Payment Amount (only negative): ");
         float price = scanner.nextFloat();
         scanner.nextLine();
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("src/main/resources/transactions.csv", true))) {
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm:ss | ");
-            //WRITES PAYMENT INFO TO TRANSACTIONS.CSV
-            bufferedWriter.write((now.format(formatter)) + new Payment(description, vendor, price));
+            //WRITES PAYMENT INFO TO TRANSACTIONS.CSV FORMATS BY FORMATTER CAT PAYMENT INSTANCE
+            bufferedWriter.write((now.format(formatter)) + new Transaction(description, vendor, description, vendor, price));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -109,8 +112,8 @@ public class Menu {
         System.out.println("P) Payments");
         System.out.println("R) Reports");
         System.out.print("Please enter your letter selection here: ");
-        String choice = scanner.nextLine().toUpperCase();
 
+        String choice = scanner.nextLine().toUpperCase();
         switch (choice) {
             case "A": //DISPLAY ALL TRANSACTIONS
                 System.out.println("Continue to full Ledger Display (Please press Enter):  ");
@@ -136,25 +139,28 @@ public class Menu {
                 System.out.println("Invalid option selected, please try again \n");
         }
     }
-    //toDO ALL OF THESE JUST BUILDING OUT BONES TO FILL OUT  ALL MUST READ FROM BOTTOM TO TOP TO SHOW NEWEST FIRST???
-    //ALL LEDGER ENTRIES SCREEN
+    //toDO makE ARRAY LIST TO SORT BY DIFFERENT WAYS
+        //todo create function to hold data in newest entries first order to reference in all display screen
+        //todo can i have it read the first line and then read from reverse from transactions.csv??? can remove 2nd println statement then
+    //ALL LEDGER ENTRIES SCREEN - SORTS BY TIME NEW TO OLD
     public static void displayAllEntries(){
         System.out.println("Newest Entries Shown first");
         System.out.println("date | time | description | vendor | amount");
         //TODO GET TO READ FROM BOTTOM TO TOP, BOTTOM HAS NEWEST ENTRIES
         }
-    //DEPOSIT DISPLAY SCREEN
+    //DEPOSIT DISPLAY SCREEN TODO display only positive int | int > 0
     public static void displayDeposits(){
         System.out.println("Newest Entries Shown First");
         System.out.println("date | time | description | vendor | amount");
         }
-    //PAYMENT DISPLAY SCREEN
+    //PAYMENT DISPLAY SCREEN TODO display only negative int | int < 0
     public static void displayPayments(){
         System.out.println("Newest Entries Shown First");
         System.out.println("date | time | description | vendor | amount");
     }
+
     //REPORTS SCREEN
-    public static void displayReports(){
+    public static void displayReports(){//todo maybe name better, naming too the same with above which does different thing
     while (true) {
         System.out.println("Welcome to the Reports Screen");
         System.out.println("Please choose from the following Report Options\n");
@@ -166,27 +172,24 @@ public class Menu {
         System.out.println("0) Back - Return to the Ledger Screen\n"); //TODO ASK TOPHER IF TYPO IN INSTURCTINOS
         System.out.print("Please enter your Number Selection Here:  /");
 
-        switch(scanInt()){
-            case 1: //TODO DISPLAY MTD REPORT
+        switch(scanInt()){//todo we gonna need math for all of this anna.
+            case 1: //TODO DISPLAY MTD REPORT: do all addition and subtraction for transactions in current month
                 break;
-            case 2: //TODO PREVIOUS MONTH
+            case 2: //TODO PREVIOUS MONTH: PREVIOUS MONTH WHAT MTD? BALANCE AT END? PROBABLY
                 break;
-            case 3: //TODO YTD
+            case 3: //TODO YTD :math functions for all transactions with same year
                 break;
-            case 4: //TODO PREVIOUS YEAR
+            case 4: //TODO PREVIOUS YEAR SAME AS CASE 2 AAAAAAA
                 break;
-            case 5: //TODO VENDOR NAME SEARCH
+            case 5: //TODO VENDOR NAME SEARCH  need to compare user input and vendor name and see if the strings match
                 break;
             case 0: //TODO RETURN TO PREVIOUS SCREEN (LEDGER??? GET CLAIRFACTION WITH INSTRUCTIONS)
                 break;
             default:
                 System.out.println("Invalid option selected, Please try again\n");
         }
-
-        }
-
+      }
     }
-
 
     // CONVIENCE METHODS GO HERE
     //convience method for choosing lettered screen choices todo dont think im acutally using this. check for code redundencany
