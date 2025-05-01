@@ -4,9 +4,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Scanner;
-
-import static com.pluralsight.ListParse.loadProducts;
 
 
 public class Menu {
@@ -76,7 +75,7 @@ public class Menu {
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm:ss | ");
             //WRITES DEPOSIT INFO TO TRANSACTIONS.CSV
-           bufferedWriter.write((now.format(formatter)) + new Transaction(description, vendor, description, vendor, price));
+           bufferedWriter.write(new Transaction(description, vendor, price).toString());//todo hate yourself for this
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -94,15 +93,13 @@ public class Menu {
         float price = scanner.nextFloat();
         scanner.nextLine();
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("src/main/resources/transactions.csv", true))) {
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm:ss | ");
             //WRITES PAYMENT INFO TO TRANSACTIONS.CSV FORMATS BY FORMATTER CAT PAYMENT INSTANCE
-            bufferedWriter.write((now.format(formatter)) + new Transaction(description, vendor, description, vendor, price));
+            bufferedWriter.write(new Transaction(description, vendor, price).toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
+// todo bright green
     //LEDGER SCREEN todo will need to call reader method to read from transactions.csv
     private static void displayLedger(){
         System.out.println("Welcome to the Leger Menu\n");
@@ -118,19 +115,18 @@ public class Menu {
             case "A": //DISPLAY ALL TRANSACTIONS
                 System.out.println("Continue to full Ledger Display (Please press Enter):  ");
                 scanner.nextLine();
-                displayAllEntries(); //STILL DOES NOTHING IMPLEMTN THING
-                //TODO SHOW ALL INFO FROM NEWEST TO OLDEST, RETURN FILE rEADER????
+                displayAllEntries();
                 break;
             case "D": //DISPLAY ONLY DEPOSITS
                 System.out.println("Continue Deposit Display (Please press Enter):  ");
                 scanner.nextLine();
-                displayDeposits(); //DOES NOTHING RN
+                displayDeposits();
                 break;
             case "P": //DISPLAY ONLY PAYMENTS
                 System.out.println("Continue to Payment Display (Please press Enter): ");
                 scanner.nextLine();
-                displayPayments(); //DOES NOTHING RN
-                //TODO CREATE LEDGER MENU BELOW
+                displayPayments();
+                break;
             case "R": //GOES TO DISPLAY REPORTS SELECTOR
                 System.out.println("Continue to Reports Screen (Please press Enter): ");
                 scanner.nextLine();
@@ -139,24 +135,41 @@ public class Menu {
                 System.out.println("Invalid option selected, please try again \n");
         }
     }
-    //toDO makE ARRAY LIST TO SORT BY DIFFERENT WAYS
-        //todo create function to hold data in newest entries first order to reference in all display screen
-        //todo can i have it read the first line and then read from reverse from transactions.csv??? can remove 2nd println statement then
+
     //ALL LEDGER ENTRIES SCREEN - SORTS BY TIME NEW TO OLD
-    public static void displayAllEntries(){
+    public static void displayAllEntries() {
         System.out.println("Newest Entries Shown first");
         System.out.println("date | time | description | vendor | amount");
-        //TODO GET TO READ FROM BOTTOM TO TOP, BOTTOM HAS NEWEST ENTRIES
+        //SORTS TRANSACTIONS BY NEWEST TO OLDEST. HOLDS SORT WITHIN TIMESORTTRANSACTION
+        ArrayList<Transaction> sorted = ListParse.loadTransactions();
+        for (Transaction timeSortTransaction : sorted) {
+            System.out.println(timeSortTransaction);
         }
-    //DEPOSIT DISPLAY SCREEN TODO display only positive int | int > 0
+    }
+    //DEPOSIT DISPLAY SCREEN checks if price is positive then only prints positive values
     public static void displayDeposits(){
         System.out.println("Newest Entries Shown First");
         System.out.println("date | time | description | vendor | amount");
+        ArrayList<Transaction> sorted = ListParse.loadTransactions();
+        for (Transaction timeSortTransaction : sorted) {
+            //positive check here
+            if (timeSortTransaction.getPrice() > 0){
+                System.out.println(timeSortTransaction);
+            }
         }
-    //PAYMENT DISPLAY SCREEN TODO display only negative int | int < 0
+    }
+
+    //PAYMENT DISPLAY SCREEN checks if price is negative then only prints negative values
     public static void displayPayments(){
         System.out.println("Newest Entries Shown First");
         System.out.println("date | time | description | vendor | amount");
+        ArrayList<Transaction> sorted = ListParse.loadTransactions();
+        for (Transaction timeSortTransaction : sorted) {
+            //negative check here
+            if (timeSortTransaction.getPrice() < 0){
+                System.out.println(timeSortTransaction);
+            }
+        }
     }
 
     //REPORTS SCREEN
@@ -173,7 +186,10 @@ public class Menu {
         System.out.print("Please enter your Number Selection Here:  /");
 
         switch(scanInt()){//todo we gonna need math for all of this anna.
-            case 1: //TODO DISPLAY MTD REPORT: do all addition and subtraction for transactions in current month
+            case 1: //DISPLAY MTD REPORT: DISPLAY TRANSACTIONS DURING MONTH, MONTH NET, AND TOTAL ACCOUNT BALANCE
+                System.out.println("Continue to Month to Date Report (Please press Enter):  ");
+                scanner.nextLine();
+                mtdReport();
                 break;
             case 2: //TODO PREVIOUS MONTH: PREVIOUS MONTH WHAT MTD? BALANCE AT END? PROBABLY
                 break;
@@ -190,20 +206,26 @@ public class Menu {
         }
       }
     }
+    //MTDREPORT: do all addition and subtraction for transactions in current month
+    public static void mtdReport(){
+        float accountTotal = 0;
+        float mtdTotal = 0;
+        ArrayList<Transaction> sorted = ListParse.loadTransactions();
+        for (Transaction timeSortTransaction : sorted) {
+            if (timeSortTransaction.getNow().getMonth().equals(LocalDateTime.now().getMonth())){
+                System.out.println(timeSortTransaction);
+                mtdTotal += timeSortTransaction.getPrice();
+            }
+            accountTotal += timeSortTransaction.getPrice();
+
+        }
+        System.out.printf("Gross Monthly Transactions: $%.2f\n", mtdTotal);
+        System.out.printf("Account Total: $%.2f\n", accountTotal);
+    }
+
 
     // CONVIENCE METHODS GO HERE
-    //convience method for choosing lettered screen choices todo dont think im acutally using this. check for code redundencany
-    private static String scanChar() {
-        while (!scanner.hasNext()) {
-            scanner.nextLine();
-            System.out.println("Please ONLY enter a single Letter");
-            System.out.print("Enter Single Letter here: ");
-        }
-        String choice = scanner.nextLine().trim().toUpperCase();
-        scanner.nextLine();
-        return choice;
-    }
-    //convience method for reports choice screen chooses report
+    // convience method for reports choice screen chooses report
     private static int scanInt(){
         while(!scanner.hasNextInt()) {
             scanner.nextLine();
