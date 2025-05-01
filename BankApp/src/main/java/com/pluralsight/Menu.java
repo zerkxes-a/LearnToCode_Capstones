@@ -1,4 +1,5 @@
 package com.pluralsight;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,11 +16,11 @@ public class Menu {
         chooseScreen();
     }
 
-    //MAIN MENU START
+    //MAIN MENU START CHOOSE NEXT SCREEN TO GO TO
     public static void chooseScreen() {
         System.out.println("Welcome to your Personal Banking App! \n");
 
-        //CREATE WHILE LOOP FOR HOMESCREEN MENU SELECTION
+        //WHILE LOOP FOR HOMESCREEN MENU SELECTION
         while (true) {
 
             System.out.println("Please choose from the following options \n");
@@ -56,10 +57,7 @@ public class Menu {
         }
     }
 
-    // TODO WHAT IS THIS WHY HEREprivate static void displayLedger() {
-    //}
-
-    //DEPOSIT SCREEN
+    //DEPOSIT SCREEN: ENTER INFO TO RECORD DEPOSIT
     private static void depositInfo() {
 
         System.out.println("Please enter some info to record a Deposit: \n");
@@ -70,44 +68,44 @@ public class Menu {
         System.out.print("Please enter the Deposit Amount (only positive): ");
         float price = scanner.nextFloat();
         scanner.nextLine(); //CONSUME LINE CLRF
-        //research what this is Anna!!!!
+        //OPENED UP FILEWRITER IN APPEND MODE, ALLOWS AUTOMATIC WRITING AND CLOSES THE WRITER
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("src/main/resources/transactions.csv", true))) {
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm:ss | ");
             //WRITES DEPOSIT INFO TO TRANSACTIONS.CSV
-           bufferedWriter.write(new Transaction(description, vendor, price).toString());//todo hate yourself for this
+            bufferedWriter.write(new Transaction(description, vendor, price).toString());//todo hate yourself for this
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    //PAYMENT SCREEN
-    private static void paymentInfo(){
+    //PAYMENT SCREEN : ENTER INFO TO RECORD A DEBIT TRANSACTION
+    private static void paymentInfo() {
 
-        System.out.println("Please fill out some info to record a payment: \n");
+        System.out.println("Please fill out some info to record a transaction: \n");
         System.out.print("Please enter the Item Purchased: ");
         String description = scanner.nextLine();
         System.out.print("Please enter the Vendor Name: ");
         String vendor = scanner.nextLine();
-        System.out.print("Please enter the Payment Amount (only negative): ");
+        System.out.print("Please enter the Transaction Amount (only negative): ");
         float price = scanner.nextFloat();
         scanner.nextLine();
+        //APPEND MODE AGAIN
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("src/main/resources/transactions.csv", true))) {
-            //WRITES PAYMENT INFO TO TRANSACTIONS.CSV FORMATS BY FORMATTER CAT PAYMENT INSTANCE
+            //WRITES PAYMENT INFO TO TRANSACTIONS.CSV
             bufferedWriter.write(new Transaction(description, vendor, price).toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-// todo bright green
-    //LEDGER SCREEN todo will need to call reader method to read from transactions.csv
-    private static void displayLedger(){
+
+    //LEDGER SCREEN
+    private static void displayLedger() {
         System.out.println("Welcome to the Leger Menu\n");
         System.out.println("Please choose from the following options: \n");
         System.out.println("A) All - display all transactions");
         System.out.println("D) Deposits");
         System.out.println("P) Payments");
         System.out.println("R) Reports");
+        System.out.println("H) Home");
         System.out.print("Please enter your letter selection here: ");
 
         String choice = scanner.nextLine().toUpperCase();
@@ -131,6 +129,12 @@ public class Menu {
                 System.out.println("Continue to Reports Screen (Please press Enter): ");
                 scanner.nextLine();
                 displayReports();
+                break;
+            case "H": //RETURNS TO HOME SCREEN
+                System.out.println("Continue to the Home Screen (Please press Enter): ");
+                scanner.nextLine();
+                chooseScreen();
+                break;
             default: //WHOOPSIE WAS DONE, REDO
                 System.out.println("Invalid option selected, please try again \n");
         }
@@ -146,94 +150,176 @@ public class Menu {
             System.out.println(timeSortTransaction);
         }
     }
+
     //DEPOSIT DISPLAY SCREEN checks if price is positive then only prints positive values
-    public static void displayDeposits(){
+    public static void displayDeposits() {
         System.out.println("Newest Entries Shown First");
         System.out.println("date | time | description | vendor | amount");
         ArrayList<Transaction> sorted = ListParse.loadTransactions();
         for (Transaction timeSortTransaction : sorted) {
             //positive check here
-            if (timeSortTransaction.getPrice() > 0){
+            if (timeSortTransaction.getPrice() > 0) {
                 System.out.println(timeSortTransaction);
             }
         }
     }
 
     //PAYMENT DISPLAY SCREEN checks if price is negative then only prints negative values
-    public static void displayPayments(){
+    public static void displayPayments() {
         System.out.println("Newest Entries Shown First");
         System.out.println("date | time | description | vendor | amount");
         ArrayList<Transaction> sorted = ListParse.loadTransactions();
         for (Transaction timeSortTransaction : sorted) {
             //negative check here
-            if (timeSortTransaction.getPrice() < 0){
+            if (timeSortTransaction.getPrice() < 0) {
                 System.out.println(timeSortTransaction);
             }
         }
     }
 
     //REPORTS SCREEN
-    public static void displayReports(){//todo maybe name better, naming too the same with above which does different thing
-    while (true) {
-        System.out.println("Welcome to the Reports Screen");
-        System.out.println("Please choose from the following Report Options\n");
-        System.out.println("1) Month To Date");
-        System.out.println("2) Previous Month");
-        System.out.println("3) Year To Date");
-        System.out.println("4) Previous Year");
-        System.out.println("5) Search by Vendor");
-        System.out.println("0) Back - Return to the Ledger Screen\n"); //TODO ASK TOPHER IF TYPO IN INSTURCTINOS
-        System.out.print("Please enter your Number Selection Here:  /");
+    public static void displayReports() {
+        while (true) {
+            System.out.println("Welcome to the Reports Screen");
+            System.out.println("Please choose from the following Report Options\n");
+            System.out.println("1) Month To Date");
+            System.out.println("2) Previous Month");
+            System.out.println("3) Year To Date");
+            System.out.println("4) Previous Year");
+            System.out.println("5) Search by Vendor");
+            System.out.println("0) Back - Return to the Ledger Screen\n");
+            System.out.print("Please enter your Number Selection Here:  /");
 
-        switch(scanInt()){//todo we gonna need math for all of this anna.
-            case 1: //DISPLAY MTD REPORT: DISPLAY TRANSACTIONS DURING MONTH, MONTH NET, AND TOTAL ACCOUNT BALANCE
-                System.out.println("Continue to Month to Date Report (Please press Enter):  ");
-                scanner.nextLine();
-                mtdReport();
-                break;
-            case 2: //TODO PREVIOUS MONTH: PREVIOUS MONTH WHAT MTD? BALANCE AT END? PROBABLY
-                break;
-            case 3: //TODO YTD :math functions for all transactions with same year
-                break;
-            case 4: //TODO PREVIOUS YEAR SAME AS CASE 2 AAAAAAA
-                break;
-            case 5: //TODO VENDOR NAME SEARCH  need to compare user input and vendor name and see if the strings match
-                break;
-            case 0: //TODO RETURN TO PREVIOUS SCREEN (LEDGER??? GET CLAIRFACTION WITH INSTRUCTIONS)
-                break;
-            default:
-                System.out.println("Invalid option selected, Please try again\n");
+            switch (scanInt()) {
+                case 1: //DISPLAY MTD REPORT: DISPLAY TRANSACTIONS DURING MONTH, MONTH NET, AND TOTAL ACCOUNT BALANCE
+                    System.out.println("Continue to Month to Date Report (Please press Enter):  ");
+                    scanner.nextLine();
+                    mtdReport();
+                    break;
+                case 2: //DISPLAY LAST MONTHS REPORT: DISPLAY TRANSACTIONS DURING LAST MONTH, THAT MONTHS NET CHANGE, AND TOTAL ACCOUNT BALANCE
+                    System.out.println("Continue to Last Months MTD Report (Please press Enter):  ");
+                    scanner.nextLine();
+                    pmtdReport();
+                    break;
+                case 3: //DISPLAY YTD REPORT: DISPLAY TRANSACTIONS DURING YEAR, YEAR NET, AND TOTAL ACCOUNT BALANCE
+                    System.out.println("Continue to Year to Date Report (Please press Enter):  ");
+                    scanner.nextLine();
+                    ytdReport();
+                    break;
+                case 4: //DISPLAY PREVIOUS YEARS REPORT: DISPLAY TRANSACTIONS DURING PREVIOUS YEAR, THAT YEARS TOTAL NET CHANGE, AND TOTAL ACCOUNT BALANCE
+                    System.out.println("Continue to the Previous Year Report (Please press Enter): ");
+                    scanner.nextLine();
+                    pytdReport();
+                    break;
+                case 5: //VENDOR NAME SEARCH: COMPARES TRANSACTIONS.CSV WITH INPUTTED VENDOR NAME
+                    System.out.println("Continue to the Vendor Search Screen (Please press Enter): ");
+                    scanner.nextLine();
+                    nameSearch();
+                    break;
+                case 0: //RETURNS TO LEDGER(PREVIOUS) PAGE
+                    System.out.println("Return to the Ledger Screen (Please press Enter):  ");
+                    scanner.nextLine();
+                    displayLedger();
+                    break;
+                default:
+                    System.out.println("Invalid option selected, Please try again\n");
+            }
         }
-      }
     }
-    //MTDREPORT: do all addition and subtraction for transactions in current month
-    public static void mtdReport(){
+
+    //MTDREPORT: displays all transactions from this month, gives net account change for current month and account total
+    public static void mtdReport() {
         float accountTotal = 0;
         float mtdTotal = 0;
         ArrayList<Transaction> sorted = ListParse.loadTransactions();
         for (Transaction timeSortTransaction : sorted) {
-            if (timeSortTransaction.getNow().getMonth().equals(LocalDateTime.now().getMonth())){
+            if (timeSortTransaction.getNow().getMonth().equals(LocalDateTime.now().getMonth())) {
                 System.out.println(timeSortTransaction);
                 mtdTotal += timeSortTransaction.getPrice();
             }
             accountTotal += timeSortTransaction.getPrice();
 
         }
-        System.out.printf("Gross Monthly Transactions: $%.2f\n", mtdTotal);
+        System.out.printf("Net Monthly Transactions: $%.2f\n", mtdTotal);
+        System.out.printf("Account Total: $%.2f\n\n", accountTotal);
+    }
+
+    //PMTDREPORT: displays transactions from previous month, gives net account change for previous month and account total
+    public static void pmtdReport() {
+        float pmtdTotal = 0;
+        float accountTotal = 0;
+        ArrayList<Transaction> sorted = ListParse.loadTransactions();
+        LocalDateTime today = LocalDateTime.now();
+        today.getMonth().minus(1);
+        for (Transaction timeSortTransaction : sorted) {
+            if (timeSortTransaction.getNow().getMonth().equals(today.getMonth().minus(1)) && timeSortTransaction.getNow().getYear() == today.getYear()){
+                System.out.println(timeSortTransaction);
+                pmtdTotal += timeSortTransaction.getPrice();
+            }
+            accountTotal += timeSortTransaction.getPrice();
+        }
+        System.out.printf("Net Change of Previous Month: $%.2f\n\n", pmtdTotal);
+        System.out.printf("Account Total: $%.2f\n\n", accountTotal);
+    }
+
+    //YTDREPORT: displays all transactions from this year, gives net account change for current year and account total
+    public static void ytdReport() {
+        float accountTotal = 0;
+        float ytdTotal = 0;
+        ArrayList<Transaction> sorted = ListParse.loadTransactions();
+        for (Transaction timeSortTransaction : sorted) {
+            if (timeSortTransaction.getNow().getYear() == (LocalDateTime.now().getYear())) {
+                System.out.println(timeSortTransaction);
+                ytdTotal += timeSortTransaction.getPrice();
+            }
+            accountTotal += timeSortTransaction.getPrice();
+        }
+        System.out.printf("Net Yearly Transactions: $%.2f\n", ytdTotal);
         System.out.printf("Account Total: $%.2f\n", accountTotal);
     }
 
+    //PYTDREPORT:  displays transactions from previous year, gives net account change for previous year and displays current account total
+    public static void pytdReport() {
+        float pytdTotal = 0;
+        float accountTotal = 0;
+        ArrayList<Transaction> sorted = ListParse.loadTransactions();
+        LocalDateTime year = LocalDateTime.now();
+        year.minusYears(1);
+        for (Transaction timeSortTransaction : sorted) {
+            if (timeSortTransaction.getNow().getYear() == year.minusYears(1).getYear()) {
+                System.out.println(timeSortTransaction);
+                pytdTotal += timeSortTransaction.getPrice();
+            }
+            accountTotal += timeSortTransaction.getPrice();
+        }
+        System.out.printf("Net Change of Previous Year: $%.2f\n\n", pytdTotal);
+        System.out.printf("Account Total: $%.2f\n\n", accountTotal);
+    }
 
-    // CONVIENCE METHODS GO HERE
-    // convience method for reports choice screen chooses report
-    private static int scanInt(){
-        while(!scanner.hasNextInt()) {
+    //NAMESEARCH: TAKES INPUT NAME AND COMPARE TO NAME FROM LIST PARSE
+    public static void nameSearch() {
+        System.out.print("Please enter the source of the Transaction(vendor): ");
+        String inputName = scanner.nextLine();
+        System.out.printf("All transactions with Vendor Name matching: %s \n\n", inputName);
+        ArrayList<Transaction> sorted = ListParse.loadTransactions();
+        for (Transaction timeSortTransaction : sorted) {
+            //NAME MATCH CHECK HERE
+            if (timeSortTransaction.getVendor().equals(inputName)) {
+                //PRINTS OUT TRANSACTIONS WITH MATCHING VENDOR NAME
+                System.out.println(timeSortTransaction);
+            }
+        }
+    }
+    //SCANINT METHOD: ALLOWS TO CHOOSE FROM NUMBERS IN REPORTS SCREEN
+    private static int scanInt() {
+        while (!scanner.hasNextInt()) {
             scanner.nextLine();
-            System.out.println("Please ONLY enter an Interger");
+            System.out.println("Please ONLY enter an Integer");
             System.out.print("Enter number here: ");
         }
-        int choice = scanner.nextInt();
-        scanner.nextLine();
-        return choice;
+    int choice = scanner.nextInt();
+    scanner.nextLine();
+    return choice;
     }
 }
+
