@@ -69,9 +69,10 @@ public class Menu {
         System.out.print("Please enter the Deposit Amount (only positive): ");
         float price = scanner.nextFloat();
         scanner.nextLine(); //CONSUME LINE CLRF
-        //OPENS UP FILEWRITER IN APPEND MODE, ALLOWS AUTOMATIC WRITING AND CLOSES THE WRITER
+        //OPENS UP FILEWRITER IN APPEND MODE, OPENS FILE AND AUTOMATICALLY WRITES USERINPUT DIRECTLY INTO TRANSACATIONS.CSV
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("src/main/resources/transactions.csv", true))) {
-            //WRITES DEPOSIT INFO TO TRANSACTIONS.CSV
+            //CREATES A NEW INSTANCE OF A TRANSACTION. AS IS ONLY POSITIVE TRANSACTION WILL BE FLAGGED AS DEPOSIT ALWAYS
+            //SEE TRANSACTION.JAVA FOR TOSTRING EXPLANATION
             bufferedWriter.write(new Transaction(description, vendor, price).toString());
         // CLOSES OUT WRITER AUTOMATICALLY HERE
         } catch (IOException ignored) {
@@ -91,7 +92,7 @@ public class Menu {
         scanner.nextLine();
         //APPEND MODE AGAIN JUST LIKE ABOVE
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("src/main/resources/transactions.csv", true))) {
-            //WRITES PAYMENT INFO TO TRANSACTIONS.CSV
+            //WRITES PAYMENT INFO TO TRANSACTIONS.CSV by putting toString at end it adds date time info SEE IN TRANSACTIONS.JAVA
             bufferedWriter.write(new Transaction(description, vendor, price).toString());
         } catch (IOException ignored) {
         }

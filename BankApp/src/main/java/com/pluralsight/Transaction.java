@@ -45,11 +45,11 @@ public class Transaction {
 
 
     @Override
-    //GETS ALL THE VALUES AND MAKES IT INTO A STRING
+    //GETS ALL THE DATETIME VALUES AND MAKES IT INTO A STRING
     public String toString() {
-
+        //FORMATS TIME SNAPSHOT INTO SPECIFIED PATTERN
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm:ss | ");
-        //
+        //FORMATS STRING TO WRITE INTO TRANSACTIONS.CSV USING THE TIME FORMATTER AND USER ENTERED INFORMATION
         return String.format("%s%s | %s | %.2f\n", now.format(dateTimeFormatter), description, vendor, price);
     }
 }
