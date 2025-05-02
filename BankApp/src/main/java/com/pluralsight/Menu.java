@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -49,8 +48,10 @@ public class Menu {
                     System.out.println("Continue to Ledger Menu (Please press Enter): ");
                     scanner.nextLine();
                     displayLedger();
+                    break;
                 case "X": //EXIT OUT OF APP
                     System.exit(0);
+                    break;
                 default: //WHOOPSIE WAS DONE, REDO
                     System.out.println("Invalid option selected, please try again \n");
             }
@@ -59,7 +60,7 @@ public class Menu {
 
     //DEPOSIT SCREEN: ENTER INFO TO RECORD DEPOSIT
     private static void depositInfo() {
-
+        //ENTER USER INPUT TO DEFINE INSTANCE OF TRANSACTION
         System.out.println("Please enter some info to record a Deposit: \n");
         System.out.print("Please enter the type of Deposit: ");
         String description = scanner.nextLine();
@@ -68,12 +69,12 @@ public class Menu {
         System.out.print("Please enter the Deposit Amount (only positive): ");
         float price = scanner.nextFloat();
         scanner.nextLine(); //CONSUME LINE CLRF
-        //OPENED UP FILEWRITER IN APPEND MODE, ALLOWS AUTOMATIC WRITING AND CLOSES THE WRITER
+        //OPENS UP FILEWRITER IN APPEND MODE, ALLOWS AUTOMATIC WRITING AND CLOSES THE WRITER
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("src/main/resources/transactions.csv", true))) {
             //WRITES DEPOSIT INFO TO TRANSACTIONS.CSV
-            bufferedWriter.write(new Transaction(description, vendor, price).toString());//todo hate yourself for this
-        } catch (IOException e) {
-            e.printStackTrace();
+            bufferedWriter.write(new Transaction(description, vendor, price).toString());
+        // CLOSES OUT WRITER AUTOMATICALLY HERE
+        } catch (IOException ignored) {
         }
     }
 
@@ -88,12 +89,11 @@ public class Menu {
         System.out.print("Please enter the Transaction Amount (only negative): ");
         float price = scanner.nextFloat();
         scanner.nextLine();
-        //APPEND MODE AGAIN
+        //APPEND MODE AGAIN JUST LIKE ABOVE
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("src/main/resources/transactions.csv", true))) {
             //WRITES PAYMENT INFO TO TRANSACTIONS.CSV
             bufferedWriter.write(new Transaction(description, vendor, price).toString());
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
         }
     }
 
@@ -142,10 +142,12 @@ public class Menu {
 
     //ALL LEDGER ENTRIES SCREEN - SORTS BY TIME NEW TO OLD
     public static void displayAllEntries() {
+        System.out.println("-Showing All Entries-");
         System.out.println("Newest Entries Shown first");
         System.out.println("date | time | description | vendor | amount");
         //SORTS TRANSACTIONS BY NEWEST TO OLDEST. HOLDS SORT WITHIN TIMESORTTRANSACTION
         ArrayList<Transaction> sorted = ListParse.loadTransactions();
+        //
         for (Transaction timeSortTransaction : sorted) {
             System.out.println(timeSortTransaction);
         }
@@ -153,6 +155,7 @@ public class Menu {
 
     //DEPOSIT DISPLAY SCREEN checks if price is positive then only prints positive values
     public static void displayDeposits() {
+        System.out.println("-Showing only Deposits-");
         System.out.println("Newest Entries Shown First");
         System.out.println("date | time | description | vendor | amount");
         ArrayList<Transaction> sorted = ListParse.loadTransactions();
@@ -166,8 +169,10 @@ public class Menu {
 
     //PAYMENT DISPLAY SCREEN checks if price is negative then only prints negative values
     public static void displayPayments() {
+        System.out.println("-Showing only Payments-");
         System.out.println("Newest Entries Shown First");
         System.out.println("date | time | description | vendor | amount");
+        //SORTS AND HOLDS TRANSACTIONS IN TIMESORTTRANSACTION
         ArrayList<Transaction> sorted = ListParse.loadTransactions();
         for (Transaction timeSortTransaction : sorted) {
             //negative check here
@@ -232,14 +237,22 @@ public class Menu {
         float accountTotal = 0;
         float mtdTotal = 0;
         ArrayList<Transaction> sorted = ListParse.loadTransactions();
+        LocalDateTime today = LocalDateTime.now();
+
+        System.out.println("Month to Date Report: \n");
         for (Transaction timeSortTransaction : sorted) {
-            if (timeSortTransaction.getNow().getMonth().equals(LocalDateTime.now().getMonth())) {
+            //if time of transaction by month is the same as current month and the year is the same as the current year, collect values.
+            if (timeSortTransaction.getNow().getMonth().equals(LocalDateTime.now().getMonth()) && timeSortTransaction.getNow().getYear() == today.getYear()) {
+                //print sorted report list to screen
                 System.out.println(timeSortTransaction);
+                //calculate mtd total
                 mtdTotal += timeSortTransaction.getPrice();
             }
+            //outside of if, calculate account total
             accountTotal += timeSortTransaction.getPrice();
 
         }
+        //prints calculated values here
         System.out.printf("Net Monthly Transactions: $%.2f\n", mtdTotal);
         System.out.printf("Account Total: $%.2f\n\n", accountTotal);
     }
@@ -250,12 +263,17 @@ public class Menu {
         float accountTotal = 0;
         ArrayList<Transaction> sorted = ListParse.loadTransactions();
         LocalDateTime today = LocalDateTime.now();
-        today.getMonth().minus(1);
+
+        //same idea as above but subtracting a month
+        System.out.println("Previous Month to Date Report: \n");
         for (Transaction timeSortTransaction : sorted) {
             if (timeSortTransaction.getNow().getMonth().equals(today.getMonth().minus(1)) && timeSortTransaction.getNow().getYear() == today.getYear()){
+                //print sorted transactions to screen
                 System.out.println(timeSortTransaction);
+                //calculate previous mtd total
                 pmtdTotal += timeSortTransaction.getPrice();
             }
+            //calculate account total
             accountTotal += timeSortTransaction.getPrice();
         }
         System.out.printf("Net Change of Previous Month: $%.2f\n\n", pmtdTotal);
@@ -267,13 +285,20 @@ public class Menu {
         float accountTotal = 0;
         float ytdTotal = 0;
         ArrayList<Transaction> sorted = ListParse.loadTransactions();
+        System.out.println("Year to Date Report: \n");
+        //within the sorted list
         for (Transaction timeSortTransaction : sorted) {
+            //if transaction year is same as current year
             if (timeSortTransaction.getNow().getYear() == (LocalDateTime.now().getYear())) {
+                //print list to screen
                 System.out.println(timeSortTransaction);
+                //ytd = all price entries added together from list
                 ytdTotal += timeSortTransaction.getPrice();
             }
+            //outside of if, add together all transactions in account
             accountTotal += timeSortTransaction.getPrice();
         }
+        //prints calculated amounts
         System.out.printf("Net Yearly Transactions: $%.2f\n", ytdTotal);
         System.out.printf("Account Total: $%.2f\n", accountTotal);
     }
@@ -284,9 +309,10 @@ public class Menu {
         float accountTotal = 0;
         ArrayList<Transaction> sorted = ListParse.loadTransactions();
         LocalDateTime year = LocalDateTime.now();
-        year.minusYears(1);
+
         for (Transaction timeSortTransaction : sorted) {
             if (timeSortTransaction.getNow().getYear() == year.minusYears(1).getYear()) {
+                System.out.println("Previous Year to Date Report: \n");
                 System.out.println(timeSortTransaction);
                 pytdTotal += timeSortTransaction.getPrice();
             }

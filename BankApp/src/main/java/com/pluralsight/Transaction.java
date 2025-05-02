@@ -12,19 +12,21 @@ public class Transaction {
     private float price;
 
 
-    //CONSTRUCTOR METHOD(USED TO CREATE INSTANCE OF OBJECT FROM INPUT IN MENU) AUTOMATICALLY SETS VALUES
+    //CONSTRUCTOR METHOD(USED TO CREATE INSTANCE OF OBJECT FROM INPUT IN MENU) RECORDS TIME AT ITEM CREATION
     public Transaction(String description, String vendor, float price){
         this.now = LocalDateTime.now();
         this.description = description;
         this.vendor = vendor;
         this.price = price;
     }
+    //MAKES THIS.NOW INTO A FORM I CAN USE, CALLS WITH DATETIME
     public Transaction(LocalDateTime dateTime, String description, String vendor, float price){
         this.now = dateTime;
         this.description = description;
         this.vendor = vendor;
         this.price = price;
     }
+    // GET METHOD TO USE WHEN SORTING INFO IN DIFFERENT WAYS
     public LocalDateTime getNow() {
         return now;
     }
@@ -42,11 +44,12 @@ public class Transaction {
     }
 
 
-
     @Override
     //GETS ALL THE VALUES AND MAKES IT INTO A STRING
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm:ss | ");
-        return String.format("%s%s | %s | %.2f\n", now.format(formatter), description, vendor, price);
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd | HH:mm:ss | ");
+        //
+        return String.format("%s%s | %s | %.2f\n", now.format(dateTimeFormatter), description, vendor, price);
     }
 }
